@@ -1,0 +1,165 @@
+body {
+  padding: 1em;
+}
+
+table#message-list tr.unread-status {
+  font-weight: bold;
+}
+
+
+table#message-list tr.unsent-status {
+  font-weight: bold;
+  font-color: red;
+}
+
+table#message-list tr.normal-status {
+}
+
+
+table#message-list p.message-text {
+  color: #bbbbbb;
+  clear: both;
+  margin-bottom: 0;
+}
+
+table#message-list td span.other-party {
+  font-weight: bold;
+  float: left;
+}
+
+table#message-list td span.received {
+  float: right;
+  color: #bbbbbb;
+}
+
+table#message-thread-table {
+  margin-top: 8em;
+  margin-bottom: 8em;
+}
+
+table#message-thread-table th {
+  text-align: center;
+  font-size: 18pt;
+}
+
+table.table td {
+border: 0;
+}
+
+/* From: http://nicolasgallagher.com/pure-css-speech-bubbles/demo/default.css */
+
+/* ============================================================================================================================
+== BUBBLE WITH A BORDER AND TRIANGLE
+** ============================================================================================================================ */
+
+/* THE SPEECH BUBBLE
+------------------------------------------------------------------------------------------------------------------------------- */
+
+.triangle-border {
+  position:relative;
+  padding:15px;
+  margin:0em 0 0em;
+/*
+  border:5px solid #5a8f00;
+  color:#333;
+  background:#fff;
+*/
+  /* css3 */
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  border-radius:10px;
+}
+
+/* Variant : for left positioned triangle
+------------------------------------------ */
+
+.triangle-border.left {
+  margin-left:30px;
+  background-color: blue;
+  color: white;
+}
+
+/* Variant : for right positioned triangle
+------------------------------------------ */
+
+.triangle-border.right {
+  margin-right:30px;
+  background-color: #bbbbbb;
+  color: black;
+}
+
+/* THE TRIANGLE
+------------------------------------------------------------------------------------------------------------------------------- */
+
+.triangle-border:before {
+  content:"";
+  position:absolute;
+  bottom:-20px; /* value = - border-top-width - border-bottom-width */
+  left:40px; /* controls horizontal position */
+  border-width:20px 20px 0;
+  border-style:solid;
+  /* reduce the damage in FF3.0 */
+  display:block;
+  width:0;
+}
+
+
+/* Variant : left
+------------------------------------------ */
+
+/* creates the larger triangle */
+.triangle-border.left:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+  left:-30px; /* value = - border-left-width - border-right-width */
+  border-width:15px 30px 15px 0;
+  border-color:transparent blue;
+}
+
+/* Variant : right
+------------------------------------------ */
+
+/* creates the larger triangle */
+.triangle-border.right:before {
+  top:10px; /* controls vertical position */
+  bottom:auto;
+  left:auto;
+  right:-30px; /* value = - border-left-width - border-right-width */
+  border-width:15px 0 15px 30px;
+  border-color:transparent #bbbbbb;
+}
+
+.message-timestamp {
+  text-align: right;
+  color: #cccccc;
+}
+
+div#message-thread-content #header {
+  z-index: 5;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  text-align: center;
+  padding-top: 1em;
+  padding-bottom: 1em;  
+  background-color: white;
+}
+
+div#message-thread-content #heading {
+  font-weight: bold;
+  text-align: center;
+  display:block;
+  font-size: 14pt;
+}
+
+#message-thread-content form#inline-reply-form {
+  z-index: 5;
+  border-top: 1px solid #bbbbbb;
+  background: white;
+  text-align: center;
+  margin-bottom: 0;
+  padding: 1em;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}

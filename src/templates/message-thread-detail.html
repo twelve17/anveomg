@@ -1,0 +1,43 @@
+<div id="message-thread-content">
+
+  <script language="javascript">
+    $(function() {
+      // http://stackoverflow.com/a/2664878/868173
+      $("body").scrollTop($("#message-thread-content")[0].scrollHeight);
+    });
+  </script>
+
+  <div id="header">
+    <p>
+    <a class="btn btn-default" style="float:left" role="button" href="${home-url}">&larr; Back</a>
+    <span id="heading">${heading}</span>
+    </p>
+    <div style="clear: both"></div>
+    <div id="flash-message" class="alert alert-info" role="alert"></div>
+  </div>
+
+  <table id="message-thread-table" class="table">
+    <thead>
+      <tr>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <form id="inline-reply-form" method="POST" class="form-horizontal">
+    <input type="hidden" id="from" name="from" value="${from}"></input>
+    <input type="hidden" id="to" name="to" value="${to}"></input>
+    <div class="form-group">
+      <input type="text" class="form-control input-xlarge" id="message" 
+        required minlength="1" name="message" value="${message}"></input>
+      <button type="submit" class="btn btn-primary">Send</button>
+    </div>
+  </form>
+
+  <!-- http://jqueryvalidation.org/validate -->
+  <script>
+    $("#inline-reply-form").validate();
+  </script>
+
+</div>

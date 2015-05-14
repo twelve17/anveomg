@@ -1,0 +1,15 @@
+{ 
+  :db { 
+    :subprotocol "mysql"
+      :subname "//127.0.0.1:3306/my-db"
+      :user "my-user"
+      :password "my-pass"
+  }
+  :anveo {
+    :mock-send-mode true
+      :my-number "15551212"
+      :post-message-url "https://www.anveo.com/api/v1.asp"
+      :call-flow-api-key "replace-me"
+  }
+  :url-prefix ""
+}

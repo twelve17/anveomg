@@ -1,0 +1,22 @@
+<div id="message-send-content">
+
+  <p>
+  <a class="btn btn-default" role="button" href="${home-url}">&larr; Back</a>
+  </p>
+
+  <div id="flash-message" class="alert alert-danger" role="alert"></div>
+
+  <form id="message-send-form" method="POST">
+    <input type="hidden" id="from" name="from" value="${from}"></input>
+    <div class="form-group">
+      <label for="to">To</label>
+      <input type="text" class="form-control" id="to" name="to" value="${to}" placeholder="Enter recipient phone number."></input>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea class="form-control" id="message" name="message" rows="5">${message}</textarea>
+    </div>
+    <button type="submit" class="btn btn-default">Send!</button>
+  </form>
+</div>
