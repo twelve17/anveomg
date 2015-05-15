@@ -154,6 +154,7 @@ Change `1.2.3.4` to Anveo's IP address (as of this writing, it is `74.86.96.2`, 
 - Fancy AJAX UI
 - NGINX integration for prod/proper deployment
 - Google Contacts API integration
+- iOS/Android notifications for future app-usage
 
 ## License
 
@@ -161,7 +162,7 @@ The source code is licensed under GPL v3. License is available [here](https://gi
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/kitt/fork )
+1. Fork it ( https://github.com/[my-github-username]/anveomg/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
