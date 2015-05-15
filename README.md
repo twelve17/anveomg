@@ -1,20 +1,20 @@
 # AnveOMG
 
-SMS message store and UI for use with anveo.com's SMS gateway.
+Message store and UI for use with anveo.com's SMS gateway.
 
-This is a little [compojure](https://github.com/weavejester/compojure) web app that interfaces with [anveo.com](http://www.anveo.com)'s SMS gateway.  It saves SMS messages sent by the gateway and provides a little UI that lets you view locally stored messages and reply to messages (sending them back to anveo).  It's my fun project to learn clojure with, so be warned, the clojure in here probably sucks.
+This is a little [compojure](https://github.com/weavejester/compojure) web app that interfaces with [anveo.com](http://www.anveo.com)'s SMS gateway.  It saves SMS messages sent by the gateway and provides a UI for viewing locally stored messages and replying to messages (sending them back to anveo).  It's my fun couple-of-days project to learn clojure with, so be warned, the clojure in here probably sucks.
 
 *Note: The author of this software is in no way affiliated with anveo.com.*
 
 ## Anveo Setup
 
-As of this writing, the free tier subscription level provides the functionality required to integrate with AnveOMG.
+As of this writing, the [free tier subscription level](http://www.anveo.com/consumer/service.asp) provides the functionality required to integrate with AnveOMG.
 
 Assuming you have a Anveo account and a phone number, do the following:
 
 - Set up a "Call Flow API Key" by loggin into your account and going to the [API link at the bottom of the page](https://www.anveo.com/api.asp).  If you have not done this already, you will see an option to create an `API UserKey` under the `API Configuration` section on the right.  You wil need this key later.
 
-- Go to the ["Phone Numbers" -> "Manage Phone Number"](https://www.anveo.com/phonenumbers.asp) page.  Click on "Edit" for the phone number you wish to integrate with AnveOMG.  Go to the SMS options tab.  Under "SMS Forwarding Options", check the box for "Forward to URL:".  Assuming you have set up AnveOMG on a host named `www.example.com` running on port `8000`, set the URL value to: `http://www.example.com:8000/api/message?from=$[from]$&to=$[to]$&message=$[message]$`.  Note that this Anveo feature does not seem to support self-signed SSL certs, so you will need to use a http URL if you do not have a self-signed SSL associated with your server running AnveOMG.
+- Go to the ["Phone Numbers" → "Manage Phone Number"](https://www.anveo.com/phonenumbers.asp) page.  Click on "Edit" for the phone number you wish to integrate with AnveOMG.  Go to the SMS options tab.  Under "SMS Forwarding Options", check the box for "Forward to URL:".  Assuming you have set up AnveOMG on a host named `www.example.com` running on port `9002`, set the URL value to: `http://www.example.com:9002/api/message?from=$[from]$&to=$[to]$&message=$[message]$`.  Note that this Anveo feature does not seem to support self-signed SSL certificates, so you will need to use a http URL unless you have a proper SSL certificate associated with your server running AnveOMG.
 
 
 ## AnveOMG Setup
@@ -23,7 +23,7 @@ Assuming you have a Anveo account and a phone number, do the following:
 
 - MySQL (I know.) Tested with:
   `Ver 14.14 Distrib 5.6.24, for osx10.10 (x86_64)`
-- Leinengen.  Tested with:
+- [Leinengen](http://leiningen.org).  Tested with:
   `Leiningen 2.5.1 on Java 1.7.0_75 Java HotSpot(TM) 64-Bit Server VM`
 
 ### Installation - Dev
@@ -34,12 +34,12 @@ Somewhere on your server, clone this repo, then:
 
 ### Installation - Prod
 
-Somewhere on your server, clone this repo.
+Somewhere on your server, clone this repo, then:
 
 
 #### Create the Database
 
-There is a schema SQL file: `etc/schema.sql`.  Create a user in mysql, grant it privileges, and then use the `mysql` command to import it, e.g:
+There is a schema SQL file: `etc/schema.sql`.  Create a user in mysql, grant it some privileges, and then use your preferred tool or the `mysql` command to import it, e.g:
 
     # mysql -u my-user -p my-db < etc/schema.sql 
 
@@ -49,9 +49,13 @@ Copy the supplied template and fill in values as necessary.
 
     # cp etc/config.edn.template  etc/config.edn
     
-Update the values in the `:db` and `:anveo` as appropriate.  Set the `:call-flow-api-key` to the key generated in the "Anveo Setup" section.  Chances are that the `:post-message-url` is correct, but you can verify this in anveo.com's [Send SMS using HTTP Gateway](http://www.anveo.com/api.asp?code=apihelp_sms_send_http&api_type=) page.
+Update the values in the `:db` and `:anveo` as appropriate.  
 
-Finally, set the `:mock-send-mode` to `false`.  (This is a mode used for testing.  Instead of sending a message to anveo.com, it saves it locally, and also creates a mock response to the message one second later.)
+Set the `:call-flow-api-key` to the key you obtained in the "Anveo Setup" section of this document.  
+
+Chances are that the `:post-message-url` is correct, but you can verify this in anveo.com's [Send SMS using HTTP Gateway](http://www.anveo.com/api.asp?code=apihelp_sms_send_http&api_type=) page.
+
+Finally, set the `:mock-send-mode` to `false`.  (This is a mode used for testing.  When enabled, instead of sending a message to anveo.com, AnveOMG saves it locally and also creates a mock response to the message one second later.)
 
 #### Running the Server
 
@@ -69,7 +73,7 @@ In addition, anveo.com's [Forward to URL](http://www.anveo.com/api.asp?code=apih
 
 So, we need to mitigate all these shortcomings as best as possible.  One way to do this is to run a web server that listens on two ports.  One port will listen for the "incomging SMS message" unauthenticated `GET` request from anveo.com (let's call this the `API port`). You can set up a firewall rule to only allow requests to the `API port` from anveo.com's IP address, otherwise you might end up with a [bot mucking up your data](http://thedailywtf.com/articles/WellIntentioned-Destruction). 
 
-Anyway, the second port will respond to HTTPS requests for the AnveOMG UI, and can be secured with basic auth (I KNOW, it's on the TODO list!).  Let's call this one the `UI port`.
+The second port will respond to HTTPS requests for the AnveOMG UI, and can be secured with basic auth (I KNOW, it's on the TODO list!).  Let's call this one the `UI port`.
 
 AnveOMG's URL paths are configured to keep these two concerns segregated:  UI paths begin with `/web`, and the API path begins with `/api`.
 
@@ -151,10 +155,21 @@ Change `1.2.3.4` to Anveo's IP address (as of this writing, it is `74.86.96.2`, 
 
 ## TODO
 
-In no particular order...
-
+- Tests :(
 - Legit auth implementation
 - User friendly timestamps
 - Fancy AJAX UI
 - NGINX integration for prod/proper deployment
 - Google Contacts API integration
+
+## License
+
+The source code is licensed under GPL v3. License is available [here](https://github.com/twelve17/anveomg/blob/master/LICENSE).
+
+## Contributing
+
+1. Fork it ( https://github.com/[my-github-username]/kitt/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
