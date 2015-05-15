@@ -26,16 +26,9 @@ Assuming you have a Anveo account and a phone number, do the following:
 - [Leinengen](http://leiningen.org).  Tested with:
   `Leiningen 2.5.1 on Java 1.7.0_75 Java HotSpot(TM) 64-Bit Server VM`
 
-### Installation - Dev
+### Installation
 
 Somewhere on your server, clone this repo, then:
-
-    # lein ring server
-
-### Installation - Prod
-
-Somewhere on your server, clone this repo, then:
-
 
 #### Create the Database
 
@@ -55,7 +48,7 @@ Set the `:call-flow-api-key` to the key you obtained in the "Anveo Setup" sectio
 
 Chances are that the `:post-message-url` is correct, but you can verify this in anveo.com's [Send SMS using HTTP Gateway](http://www.anveo.com/api.asp?code=apihelp_sms_send_http&api_type=) page.
 
-Finally, set the `:mock-send-mode` to `false`.  (This is a mode used for testing.  When enabled, instead of sending a message to anveo.com, AnveOMG saves it locally and also creates a mock response to the message one second later.)
+Finally, unless you are going to be developing on this code, set the `:mock-send-mode` to `false`.  (This is a mode that, when enabled, omits sending a message to anveo.com, and instead saves it locally and also creates a mock response to the message timestamped one second later.)
 
 #### Running the Server
 
