@@ -12,7 +12,7 @@ As of this writing, the [free tier subscription level](http://www.anveo.com/cons
 
 Assuming you have a Anveo account and a phone number, do the following:
 
-- Set up a "Call Flow API Key" by loggin into your account and going to the [API link at the bottom of the page](https://www.anveo.com/api.asp).  If you have not done this already, you will see an option to create an `API UserKey` under the `API Configuration` section on the right.  You wil need this key later.
+- Obtain "Call Flow API Key" by logging into your account and going to the [API link at the bottom of the page](https://www.anveo.com/api.asp).  If you have not done this already, you will see an option to create an `API UserKey` under the `API Configuration` section on the right.  You wil need this key later.
 
 - Go to the ["Phone Numbers" → "Manage Phone Number"](https://www.anveo.com/phonenumbers.asp) page.  Click on "Edit" for the phone number you wish to integrate with AnveOMG.  Go to the SMS options tab.  Under "SMS Forwarding Options", check the box for "Forward to URL:".  Assuming you have set up AnveOMG on a host named `www.example.com` running on port `9002`, set the URL value to: `http://www.example.com:9002/api/message?from=$[from]$&to=$[to]$&message=$[message]$`.  Note that this Anveo feature does not seem to support self-signed SSL certificates, so you will need to use a http URL unless you have a proper SSL certificate associated with your server running AnveOMG.
 
