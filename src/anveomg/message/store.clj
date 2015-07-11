@@ -174,6 +174,20 @@
     (log/info "posting message to anveo: " (pr-str form-params))
     (client/post (:post-message-url conf) {:form-params form-params})))
 
+(defn send-pushover-notification
+  [conf record]
+  (let [form-params {
+                     :token (:api_token conf)
+                     :user (:user_key conf)
+                     :device (:device conf)
+                     :title (str "Message From " (:from record))
+                     :message (:message record)
+                     :url (str "/messages/thread/" (:from record) "/" (:to record)) 
+                     }])
+    (log/info "sending pushover notification" record)
+    (client/post (:api_url conf) {:form-params form-params})  
+  )
+
 (defn- parse-anveo-response
   [response]
   (log/info "parsing response from anveo:" (pr-str response))
@@ -191,9 +205,11 @@
    (update-message db message-id record)))
 
 (defn save-incoming-message
-  [db record]
+  [pushover-config db record]
   (log/info "saving incoming message:" record)
-  (insert-message db (record->db-map record) "UNREAD"))
+  (insert-message db (record->db-map record) "UNREAD")
+  (send-pushover-notification pushover-config record))
+  
 
 (defn mock-post-message-with-response 
   [db record]

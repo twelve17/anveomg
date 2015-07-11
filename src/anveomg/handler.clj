@@ -13,6 +13,7 @@
 (let [config (anveomg.config/load-config "./etc/config.edn") 
       db (:db config)
       anveo (:anveo config)
+      pushover (:pushover config)
       url-prefix (:url-prefix config)
       my-phone-number (:my-number anveo)
       home-url (str url-prefix "/web/messages/thread-summary")]
@@ -46,7 +47,7 @@
 
     (context "/api" []
              (GET "/message" {params :params}
-                  (pr-str (store/save-incoming-message db params))))
+                  (pr-str (store/save-incoming-message pushover db params))))
 
     (route/not-found "Not Found")))
 
