@@ -183,9 +183,9 @@
                      :title (str "Message From " (:from record))
                      :message (:message record)
                      :url (str "/messages/thread/" (:from record) "/" (:to record)) 
-                     }])
+                     }]
     (log/info "sending pushover notification" record)
-    (client/post (:api_url conf) {:form-params form-params})  
+    (client/post (:api_url conf) {:form-params form-params}))  
   )
 
 (defn- parse-anveo-response
