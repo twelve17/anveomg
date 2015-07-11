@@ -12,7 +12,7 @@ As of this writing, the [free tier subscription level](http://www.anveo.com/cons
 
 Assuming you have a Anveo account and a phone number, do the following:
 
-- Set up a "Call Flow API Key" by loggin into your account and going to the [API link at the bottom of the page](https://www.anveo.com/api.asp).  If you have not done this already, you will see an option to create an `API UserKey` under the `API Configuration` section on the right.  You wil need this key later.
+- Obtain "Call Flow API Key" by logging into your account and going to the [API link at the bottom of the page](https://www.anveo.com/api.asp).  If you have not done this already, you will see an option to create an `API UserKey` under the `API Configuration` section on the right.  You wil need this key later.
 
 - Go to the ["Phone Numbers" → "Manage Phone Number"](https://www.anveo.com/phonenumbers.asp) page.  Click on "Edit" for the phone number you wish to integrate with AnveOMG.  Go to the SMS options tab.  Under "SMS Forwarding Options", check the box for "Forward to URL:".  Assuming you have set up AnveOMG on a host named `www.example.com` running on port `9002`, set the URL value to: `http://www.example.com:9002/api/message?from=$[from]$&to=$[to]$&message=$[message]$`.  Note that this Anveo feature does not seem to support self-signed SSL certificates, so you will need to use a http URL unless you have a proper SSL certificate associated with your server running AnveOMG.
 
@@ -26,16 +26,9 @@ Assuming you have a Anveo account and a phone number, do the following:
 - [Leinengen](http://leiningen.org).  Tested with:
   `Leiningen 2.5.1 on Java 1.7.0_75 Java HotSpot(TM) 64-Bit Server VM`
 
-### Installation - Dev
+### Installation
 
 Somewhere on your server, clone this repo, then:
-
-    # lein ring server
-
-### Installation - Prod
-
-Somewhere on your server, clone this repo, then:
-
 
 #### Create the Database
 
@@ -55,7 +48,7 @@ Set the `:call-flow-api-key` to the key you obtained in the "Anveo Setup" sectio
 
 Chances are that the `:post-message-url` is correct, but you can verify this in anveo.com's [Send SMS using HTTP Gateway](http://www.anveo.com/api.asp?code=apihelp_sms_send_http&api_type=) page.
 
-Finally, set the `:mock-send-mode` to `false`.  (This is a mode used for testing.  When enabled, instead of sending a message to anveo.com, AnveOMG saves it locally and also creates a mock response to the message one second later.)
+Finally, unless you are going to be developing on this code, set the `:mock-send-mode` to `false`.  (This is a mode that, when enabled, omits sending a message to anveo.com, and instead saves it locally and also creates a mock response to the message timestamped one second later.)
 
 #### Running the Server
 
@@ -161,6 +154,7 @@ Change `1.2.3.4` to Anveo's IP address (as of this writing, it is `74.86.96.2`, 
 - Fancy AJAX UI
 - NGINX integration for prod/proper deployment
 - Google Contacts API integration
+- iOS/Android notifications for future app-usage
 
 ## License
 
@@ -168,7 +162,7 @@ The source code is licensed under GPL v3. License is available [here](https://gi
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/kitt/fork )
+1. Fork it ( https://github.com/[my-github-username]/anveomg/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
