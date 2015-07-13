@@ -174,7 +174,7 @@
     (log/info "posting message to anveo: " (pr-str form-params))
     (client/post (:post-message-url conf) {:form-params form-params})))
 
-(defn send-pushover-notification
+(defn- send-pushover-notification
   [conf record]
   (let [form-params {
                      :token (:api_token conf)
