@@ -8,6 +8,7 @@
                  [clj-time "0.8.0"]
                  [clj-http "1.1.2"]
                  [com.cemerick/url "0.1.1"]
+                 [buddy/buddy-auth "0.6.0"]
                  [com.googlecode.libphonenumber/libphonenumber "7.0.5"]
                  [enlive "1.1.5"]
                  [mysql/mysql-connector-java "5.1.25"] 

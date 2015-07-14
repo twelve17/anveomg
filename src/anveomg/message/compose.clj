@@ -1,7 +1,6 @@
 (ns anveomg.message.compose
   (:require [ring.util.anti-forgery :refer [anti-forgery-field]]
             [net.cgrand.enlive-html :as html]
-            [clojure.tools.logging :as log]  
             [anveomg.templates :as templates]))
 
 ; [name source selector args & forms]
