@@ -3,16 +3,37 @@
   (:require [clojure.java.jdbc :as j]
             [clojure.tools.logging :as log]
             [clj-http.client :as client]
+            [clj-time.local :as l]
             [clj-time.format :as time-format]
             [clj-time.coerce]
             [anveomg.phone-number :as phone]))
 
 (def default-list-limit 50)
 
+; Show human friendly display time, with these shortcut names:
+; (today): just show time 
+; (yesterday): show "Yesterday <time>"
+; (before yesterday): 
+;   - if delta days < 7, show week day
+;   - if delta days > 7
+;      - if years !=, show month and day year + time
+;      - else if years ==, show month and day + time
 (defn- sqltime->humantime
   [sqltime]
-  (let [joda (clj-time.coerce/from-long (.getTime sqltime))]
-    (clj-time.format/unparse (clj-time.format/formatters :rfc822) joda)))
+  (let [received (l/to-local-date-time (clj-time.coerce/from-long (.getTime sqltime))) 
+        now (l/local-now)
+        days-between (.getDays (org.joda.time.Days/daysBetween received now))]
+    (if (= 0 days-between)
+      "Today"
+      (if (= 1 days-between)
+        "Yesterday"
+        (if (< days-between 7) 
+          (.getAsShortText (.dayOfWeek received)) 
+          (let [dt-format (org.joda.time.format.DateTimeFormat/forPattern 
+                            (if (= (.getYear received) (.getYear now)) 
+                              "MMM d HH:m"
+                              "MMM d yyyy HH:m"))]
+            (.print dt-format received)))))))
 
 (defn- parse-limit 
   [limit default-limit]
