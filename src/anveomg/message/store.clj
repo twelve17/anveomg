@@ -18,7 +18,7 @@
 ;   - if delta days > 7
 ;      - if years !=, show month and day year + time
 ;      - else if years ==, show month and day + time
-(defn- sqltime->humantime
+(defn sqltime->humantime
   [sqltime]
   (let [received (l/to-local-date-time (clj-time.coerce/from-long (.getTime sqltime))) 
         now (l/local-now)
@@ -31,8 +31,8 @@
           (.getAsShortText (.dayOfWeek received)) 
           (let [dt-format (org.joda.time.format.DateTimeFormat/forPattern 
                             (if (= (.getYear received) (.getYear now)) 
-                              "MMM d HH:m"
-                              "MMM d yyyy HH:m"))]
+                              "MMM d HH:mm"
+                              "MMM d yyyy HH:mm"))]
             (.print dt-format received)))))))
 
 (defn- parse-limit 

@@ -10,7 +10,7 @@
 
 (defn- record->hiccup
   [my-phone-number record]
-  (let [timestamp [:p {:class "message-timestamp"}  (:received record)]
+  (let [timestamp [:p {:class "message-timestamp"}  (store/sqltime->humantime (:received record))]
         td-width {:style "width: 50%"}
         common-p {:data-id (:id record) :data-from (:from record) :data-to (:to record)}
         is-from-me? (phone/equal my-phone-number (:from record))]
