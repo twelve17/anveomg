@@ -24,9 +24,9 @@
         now (l/local-now)
         days-between (.getDays (org.joda.time.Days/daysBetween received now))]
     (if (= 0 days-between)
-      "Today"
+      (.print (org.joda.time.format.DateTimeFormat/forPattern "Today HH:mm") received) 
       (if (= 1 days-between)
-        "Yesterday"
+        (.print (org.joda.time.format.DateTimeFormat/forPattern "Yesterday HH:mm") received) 
         (if (< days-between 7) 
           (.getAsShortText (.dayOfWeek received)) 
           (let [dt-format (org.joda.time.format.DateTimeFormat/forPattern 
