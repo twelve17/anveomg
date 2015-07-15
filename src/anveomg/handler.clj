@@ -2,10 +2,9 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [clojure.tools.logging :as log]  
-            [ring.middleware.defaults :refer [wrap-defaults site-defaults secure-site-defaults]]
             [ring.util.anti-forgery :refer [anti-forgery-field]]
             [ring.util.response :refer [redirect]]
-            [buddy.auth :refer  [authenticated? throw-unauthorized]]
+            [buddy.auth :refer [authenticated? throw-unauthorized]]
             [buddy.auth.backends.session :refer [session-backend]]
             [buddy.auth.middleware :refer [wrap-authentication  wrap-authorization]]
             [net.cgrand.enlive-html :as html]
@@ -26,11 +25,9 @@
     [ring.middleware.params :only [wrap-params]]
     [ring.middleware.cookies :only [wrap-cookies]]
     [ring.middleware.resource :only [wrap-resource]]
-    [ring.middleware.file :only [wrap-file]]
     [ring.middleware.not-modified :only [wrap-not-modified]]
     [ring.middleware.content-type :only [wrap-content-type]]
     [ring.middleware.absolute-redirects :only [wrap-absolute-redirects]]
-    [ring.middleware.ssl :only [wrap-ssl-redirect wrap-hsts wrap-forwarded-scheme]]
     [ring.middleware.proxy-headers :only [wrap-forwarded-remote-addr]]))
 
 
@@ -46,12 +43,12 @@
                 [:form [:#next]] (html/set-attr :value (:next params))
                 [:form] (html/append (html/html-snippet (anti-forgery-field)))))
  
-(defn login 
+(defn- login 
   [params]
   ; TODO: hack: using phone # field for "Login" placeholder
   (templates/content-template {:my-phone-number "Login"} ((login-snippet params))))
 
-(defn logout
+(defn- logout
   [context]
   (-> (redirect (str context  "/login"))
       (assoc :session {})))
@@ -78,7 +75,7 @@
         (log/info "redirecting to: " next-url)
         (-> (redirect next-url)
             (assoc :session updated-session)))
-      (login (:params request))))
+      (login (:params request)))))
 
 (defn unauthorized-handler
   [request metadata]
@@ -87,11 +84,36 @@
 
 ;; Create an instance of auth backend.
 (def auth-backend
-  (session-backend  {:unauthorized-handler unauthorized-handler}))
+  (session-backend {:unauthorized-handler unauthorized-handler}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Routes/Handlers                                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn- anveo-wrap-defaults
+  [handler]
+  (-> handler
+      (wrap-authorization auth-backend)
+      (wrap-authentication auth-backend)
+      (wrap-flash)
+      (wrap-anti-forgery)
+      (wrap-session)
+      (wrap-keyword-params)
+      (wrap-nested-params)
+      ;(wrap-multipart-params (get-in config [:params :multipart] false))
+      (wrap-params)
+      (wrap-cookies)
+      (wrap-absolute-redirects)
+      (wrap-resource "public")
+      ;(wrap-file)
+      (wrap-content-type)
+      ;(wrap-not-modified     (get-in config [:responses :not-modified-responses] false))
+      ;(wrap-x-headers        (:security config))
+      ;(wrap-hsts)
+      ;(wrap-ssl-redirect     (get-in config [:security :ssl-redirect] false))
+      ;(wrap-forwarded-scheme)
+      (wrap-forwarded-remote-addr)))
+
 
 (let [config (anveomg.config/load-config "./etc/config.edn") 
       db (:db config)
@@ -103,7 +125,6 @@
 
   (defroutes app-routes
     (GET "/" [] (redirect home-url)) 
-
     (context "/web" []
 
              (GET "/login" {params :params} (login params))
@@ -147,36 +168,8 @@
 
     (context "/api" {server-name :server-name server-port :server-port scheme :scheme}
              (GET "/message" {params :params}
-                  (pr-str (store/save-incoming-message (assoc pushover :server-url (:public-server-url-base config)) db params)))))
+		  (pr-str (store/save-incoming-message (assoc pushover :server-url (:public-server-url-base config)) db params))))
 
     (route/not-found "Not Found")))
 
-(defn- anveo-wrap-defaults
-  "Wraps a handler in default Ring middleware, as specified by the supplied
-  configuration map."
-  [handler config]
-  (-> handler
-      (wrap-authorization auth-backend)
-      (wrap-authentication   auth-backend)
-      (wrap-flash)
-      (wrap-anti-forgery)
-      (wrap-session)
-      (wrap-keyword-params)
-      (wrap-nested-params)
-      ;(wrap-multipart-params (get-in config [:params :multipart] false))
-      (wrap-params)
-      (wrap-cookies)
-      (wrap-absolute-redirects)
-      (wrap-resource "public")
-      ;(wrap-file)
-      (wrap-content-type)
-      ;(wrap-not-modified     (get-in config [:responses :not-modified-responses] false))
-      ;(wrap-x-headers        (:security config))
-      (wrap-hsts)
-      ;(wrap-ssl-redirect     (get-in config [:security :ssl-redirect] false))
-      (wrap-forwarded-scheme)
-      (wrap-forwarded-remote-addr)))
-
-(def app (anveo-wrap-defaults app-routes site-defaults))
-
-;(def app (wrap-authentication (wrap-defaults app-routes site-defaults) auth-backend))
+(def app (anveo-wrap-defaults app-routes))
