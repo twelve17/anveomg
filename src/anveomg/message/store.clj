@@ -28,7 +28,7 @@
       (if (= 1 days-between)
         (.print (org.joda.time.format.DateTimeFormat/forPattern "Yesterday HH:mm") received) 
         (if (< days-between 7) 
-          (.getAsShortText (.dayOfWeek received)) 
+          (.print (org.joda.time.format.DateTimeFormat/forPattern "EEE HH:mm") received) 
           (let [dt-format (org.joda.time.format.DateTimeFormat/forPattern 
                             (if (= (.getYear received) (.getYear now)) 
                               "MMM d HH:mm"
