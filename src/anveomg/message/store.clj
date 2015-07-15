@@ -24,9 +24,9 @@
         now (l/local-now)
         days-between (.getDays (org.joda.time.Days/daysBetween received now))]
     (if (= 0 days-between)
-      (.print (org.joda.time.format.DateTimeFormat/forPattern "Today HH:mm") received) 
+      (str "Today " (.print (org.joda.time.format.DateTimeFormat/forPattern "HH:mm") received))
       (if (= 1 days-between)
-        (.print (org.joda.time.format.DateTimeFormat/forPattern "Yesterday HH:mm") received) 
+        (str "Yesterday " (.print (org.joda.time.format.DateTimeFormat/forPattern "HH:mm") received))
         (if (< days-between 7) 
           (.print (org.joda.time.format.DateTimeFormat/forPattern "EEE HH:mm") received) 
           (let [dt-format (org.joda.time.format.DateTimeFormat/forPattern 
@@ -203,7 +203,7 @@
                      :device (:device conf)
                      :title (str "Message From " (:from record))
                      :message (:message record)
-                     :url (str (:server-url conf) "/messages/thread/" (phone/format-db (:from record)) "/" (phone/format-db (:to record))) 
+                     :url (str (:server-url conf) "/web/messages/thread-detail/" (phone/format-db (:from record)) "/" (phone/format-db (:to record))) 
                      }]
     (log/info "sending pushover notification" record)
     (client/post (:api_url conf) {:form-params form-params}))  
