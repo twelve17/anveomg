@@ -7,10 +7,14 @@
     });
 
     function deleteThread(deleteUrl, homeUrl) {
+      // hijack the anti-forgery token used by the reply form
       if (confirm('Delete thread?')) {
         $.ajax({
           type: "DELETE",
           url: deleteUrl,
+          data: {
+            "__anti-forgery-token": $('#inline-reply-form input#__anti-forgery-token').val()
+          },
           success: function() { document.location.href=homeUrl }
         });
       }

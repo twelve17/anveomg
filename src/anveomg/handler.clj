@@ -70,8 +70,8 @@
          session  (:session request)
          found-password  (get (:users config) (keyword username))]
     (if (and found-password  (= found-password password))
-      (let [next-url (str (:public-server-url-base config) (get-in request [:query-params :next] "/"))
-            updated-session (assoc session :identity  (keyword username))]
+      (let [next-url (str (:public-server-url-base config) (get-in request [:params :next] "/"))
+            updated-session (assoc session :identity (keyword username))]
         (log/info "redirecting to: " next-url)
         (-> (redirect next-url)
             (assoc :session updated-session)))
@@ -90,9 +90,14 @@
 ;; Routes/Handlers                                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn wrap-logging 
+  [handler] 
+  (fn [request] (log/info "req:" request) (handler request)))
+
 (defn- anveo-wrap-defaults
   [handler]
   (-> handler
+;      (wrap-logging)
       (wrap-authorization auth-backend)
       (wrap-authentication auth-backend)
       (wrap-flash)
@@ -143,14 +148,15 @@
                     (throw-unauthorized)
 
                     (let [message-form-url (str (:context request) "/message")
-                          delete-thread-url (:uri request)] 
+                          delete-thread-url (:uri request)]
                       (thread-detail/render (:params request) home-url message-form-url delete-thread-url my-phone-number db))))
 
              (DELETE "/messages/thread/:from/:to" request
+                  (log/info "request session:" (:session request))
                   (if-not (authenticated? request)
                     (throw-unauthorized)
-                    (do (store/delete-thread (:from (:params request)) (:to (:params request)))
-                    (redirect home-url))))
+                    (do (store/delete-thread db (:from (:params request)) (:to (:params request)))
+                    {:status 204})))
 
              (GET "/message" request
                   (if-not (authenticated? request)
