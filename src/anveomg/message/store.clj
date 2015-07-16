@@ -67,11 +67,6 @@
   ([db row-fn] 
    (thread-summary db default-list-limit row-fn)))
 
-(defn delete-thread
-  ([db from to] 
-   (log/info "deleting thread: " from "<->" to)
-   (j/delete! db :messages ["'from' = ? AND 'to' = ?" from to])))
-
 ; AR made me a little SQL rusty :)
 ; http://stackoverflow.com/a/28090544/868173
 ; TODO: limit to X recent records
@@ -117,6 +112,13 @@
         contact_id)
       )))
 
+(defn delete-thread
+  ([db from to] 
+   (let [from_id (get-contact-id db from)
+         to_id (get-contact-id db to)]
+     (log/info "deleting thread: " from "(" from_id ") <-> " to "(" to_id ")")
+     (j/delete! db :messages ["(from_id = ? AND to_id = ?) OR (to_id = ? AND from_id = ?)" from_id to_id from_id to_id]))))
+ 
 (defn- timestamp
   []
   (java.sql.Timestamp. (.getTimeInMillis (java.util.Calendar/getInstance))))
