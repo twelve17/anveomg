@@ -5,12 +5,23 @@
       // http://stackoverflow.com/a/2664878/868173
       $("body").scrollTop($("#message-thread-content")[0].scrollHeight);
     });
+
+    function deleteThread(deleteUrl, homeUrl) {
+      if (confirm('Delete thread?')) {
+        $.ajax({
+          type: "DELETE",
+          url: deleteUrl,
+          success: function() { document.location.href=homeUrl }
+        });
+      }
+    }
   </script>
 
   <div id="header">
     <p>
     <a class="btn btn-default" style="float:left" role="button" href="${home-url}">&larr; Back</a>
     <span id="heading">${heading}</span>
+    <a class="btn btn-danger" style="float:right" role="button" href="#" onClick="deleteThread('${delete-thread-url}','${home-url}')">Delete</a>
     </p>
     <div style="clear: both"></div>
     <div id="flash-message" class="alert alert-info" role="alert"></div>

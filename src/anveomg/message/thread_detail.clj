@@ -11,12 +11,13 @@
 (defn- record->hiccup
   [my-phone-number record]
   (let [timestamp [:p {:class "message-timestamp"}  (store/sqltime->humantime (:received record))]
-        td-width {:style "width: 50%"}
+        td-width {:style "width: 75%"}
+        inner-table-width {:style "width: 100%"} 
         common-p {:data-id (:id record) :data-from (:from record) :data-to (:to record)}
         is-from-me? (phone/equal my-phone-number (:from record))]
     (if is-from-me?
-      [:tr [:td] [:td td-width [:p (merge {:class "triangle-border right" :data-id (:id record)} common-p) (:message record)] timestamp ]]
-      [:tr [:td td-width [:p (merge {:class "triangle-border left"} common-p) (:message record)] timestamp] [:td]])))
+      [:tr [:td [:table inner-table-width [:tr [:td] [:td td-width [:p (merge {:class "triangle-border right" :data-id (:id record)} common-p) (:message record)] timestamp ]]]]]
+      [:tr [:td [:table inner-table-width [:tr [:td td-width [:p (merge {:class "triangle-border left"} common-p) (:message record)] timestamp] [:td]]]]])))
 
 (defn record->html
   [my-phone-number record]
@@ -33,12 +34,13 @@
 
 (def snippet (html/snippet "templates/message-thread-detail.html"
                            [:#message-thread-content]
-                           [my-phone-number other-party message thread home-url post-url flash]
+                           [my-phone-number other-party message thread home-url reply-url delete-thread-url flash]
 
                            [:#message-thread-content html/any-node] (html/replace-vars {
                                                                                         :heading (phone/format-displayable other-party)
                                                                                         :home-url home-url 
-                                                                                        :post-url post-url 
+                                                                                        :reply-url reply-url 
+                                                                                        :delete-thread-url delete-thread-url 
                                                                                         :from my-phone-number
                                                                                         :to other-party
                                                                                         :message message })
@@ -50,12 +52,17 @@
                                                  (html/content flash))  
                                                (html/set-attr :style "display: none"))
 
-                           [:#inline-reply-form] ( html/do-> 
+                           [:#inline-reply-form] (html/do-> 
                                                    (html/append (html/html-snippet (anti-forgery-field)))
-                                                   (html/set-attr :action post-url ))))
+                                                   (html/set-attr :action reply-url))
+
+                           [:#delete-thread-form] (html/do-> 
+                                                   (html/append (html/html-snippet (anti-forgery-field)))
+                                                   (html/set-attr :action delete-thread-url))
+))
 
 (defn render
-  [params home-url message-form-url my-phone-number db]
+  [params home-url message-form-url delete-thread-url my-phone-number db]
   (let [from (:from params)
         to (:to params)
         is-from-me? (phone/equal my-phone-number from)
@@ -66,7 +73,7 @@
         parsed-status (if (nil? raw-status) nil (parse-message-status-str raw-status))
         record->html (partial record->html my-phone-number)
         records-html (store/thread-detail db limit (phone/format-db from) (phone/format-db to) record->html)
-        snippet (snippet my-phone-number other-party message records-html home-url message-form-url parsed-status)
+        snippet (snippet my-phone-number other-party message records-html home-url message-form-url delete-thread-url parsed-status)
         page-html (templates/content-template {:my-phone-number my-phone-number} snippet)]
     (log/info "getting thread: " from "<->" to)
     ; only mark thread read if we were able to read the template above w/o issues

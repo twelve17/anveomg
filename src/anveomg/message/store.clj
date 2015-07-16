@@ -67,6 +67,10 @@
   ([db row-fn] 
    (thread-summary db default-list-limit row-fn)))
 
+(defn delete-thread
+  ([db from to] 
+   (let [sql "delete from messages where from = ? and to = ?"] 
+     (j/query db [sql from to]))))
 
 ; AR made me a little SQL rusty :)
 ; http://stackoverflow.com/a/28090544/868173

@@ -142,8 +142,15 @@
                   (if-not (authenticated? request)
                     (throw-unauthorized)
 
-                    (let [message-form-url (str (:context request) "/message")] 
-                      (thread-detail/render (:params request) home-url message-form-url my-phone-number db))))
+                    (let [message-form-url (str (:context request) "/message")
+                          delete-thread-url (:uri request)] 
+                      (thread-detail/render (:params request) home-url message-form-url delete-thread-url my-phone-number db))))
+
+             (DELETE "/messages/thread/:from/:to" request
+                  (if-not (authenticated? request)
+                    (throw-unauthorized)
+                    (do (store/delete-thread (:from (:params request)) (:to (:params request)))
+                    (redirect home-url))))
 
              (GET "/message" request
                   (if-not (authenticated? request)
